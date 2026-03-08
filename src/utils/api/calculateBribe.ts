@@ -110,7 +110,7 @@ export async function calculateSingleOffer(
 
   // usdPerVp, UsdPer1000Vp
   const usdPerVp = Number((rewardAmount / votes).toFixed(7));
-  const usdPer1000Vp = Number((usdPerVp * 1000).toFixed(2));
+  const usdPer1000Vp = Number((usdPerVp * 1000).toFixed(7));
 
   return {
     usdPer1000Vp,

@@ -1,6 +1,8 @@
 import type { Echarts } from "types/echarts.trpc";
 import { trpc } from "utils/trpc";
-import ReactECharts from "echarts-for-react";
+import dynamic from 'next/dynamic';
+
+const ReactECharts = dynamic(() => import('echarts-for-react'), { ssr: false });
 import { useGlobalContext } from "contexts/GlobalContext";
 import { useColorModeValue, Progress, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -78,13 +80,13 @@ function Chart1() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       formatter: (args: any) => {
         //console.log(args);
-        let tooltip = `<p align='center'><b>${args[0].axisValue} - 
+        let tooltip = `<p align='center'><b>${args[0].axisValue} -
                         ${args[1].axisValue}</b></p>
                           <table> `;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         args.forEach((item: any) => {
-          tooltip += `<tr><td>${item.marker}</td><td> ${item.seriesName}:</td><td align='right'> 
+          tooltip += `<tr><td>${item.marker}</td><td> ${item.seriesName}:</td><td align='right'>
             ${item.value.toLocaleString(undefined, { maximumFractionDigits: 4 })}</td></tr>`;
         });
         tooltip += `</table>`;
@@ -505,16 +507,18 @@ function Chart1() {
 
   return (
     <>
-        <Text
-            fontSize={["sm", "xl", "3xl", "4xl", "5xl"]}
-            fontWeight="600"
-            margin="20px"
-            textAlign="center"
-          >
-            Gauge Vote History
-          </Text><ReactECharts option={option} onEvents={onEvents} style={{ height: 1200 }} /><Text variant="body2" align="center">
-              (clicking on data points loads historical pages)
-        </Text>
+      <Text
+        fontSize={["sm", "xl", "3xl", "4xl", "5xl"]}
+        fontWeight="600"
+        margin="20px"
+        textAlign="center"
+      >
+        Gauge Vote History
+      </Text>
+      <ReactECharts option={option} onEvents={onEvents} style={{ height: 1200 }} />
+      <Text variant="body2" align="center">
+        (clicking on data points loads historical pages)
+      </Text>
     </>
   );
 }

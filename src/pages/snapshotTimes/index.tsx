@@ -1,7 +1,9 @@
 /// WIP - ignore :-)
 
 import { useState, useEffect } from "react";
-import ReactECharts from "echarts-for-react";
+import dynamic from 'next/dynamic';
+
+const ReactECharts = dynamic(() => import('echarts-for-react'), { ssr: false });
 import { useColorModeValue, Progress, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { request, gql } from "graphql-request";

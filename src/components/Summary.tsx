@@ -56,7 +56,7 @@ export const Summary = (props: SummaryProps) => {
           {headerData.avgPer1000.toLocaleString(undefined, {
             style: "currency",
             currency: "USD",
-            maximumFractionDigits: 2,
+            maximumFractionDigits: 4,
           })}
         </Text>
         <Text>Bribed Voter: {headerData.bribedVoter}</Text>

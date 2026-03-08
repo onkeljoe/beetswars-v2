@@ -136,6 +136,7 @@ export default function Round() {
                         {bribe.usdPer1000Vp.toLocaleString(undefined, {
                           style: "currency",
                           currency: "USD",
+                          maximumFractionDigits: 4,
                         })}
                       </Text>
                       <Popover placement="auto-start">
