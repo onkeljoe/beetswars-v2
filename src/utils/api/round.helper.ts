@@ -7,6 +7,12 @@ import type { Config } from "types/config.raw";
 import { insertBribefile, readOneBribefile } from "utils/database/bribefile.db";
 import { getAutomationData } from "utils/externalData/github";
 
+export function getPoolUrl(poolId: string): string {
+  const base = "https://beets.fi/pools/";
+  if (!poolId) return base;
+  return base + (poolId.length > 42 ? "sonic/v2/" : "sonic/v3/") + poolId;
+}
+
 export async function addRoundFromSnapshot(): Promise<string | null> {
   const latest = Number(await findConfigEntry("latest")) || 0; // latest round number in database
   const latestProposal = await getSnapshotLatestRound(); // latest round proposal on snapshot

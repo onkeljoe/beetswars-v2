@@ -1,13 +1,20 @@
 import * as z from "zod";
 
+export const ProtocolBounty = z.object({
+  tokenAddress: z.string(),
+  amount: z.number(),
+});
+export type ProtocolBounty = z.infer<typeof ProtocolBounty>;
+
 export const Gauge = z.object({
   poolName: z.string(),
   poolId: z.string(),
-  weeklyBeetsAmountFromGauge: z.union([z.number(), z.string()]),
-  weeklyBeetsAmountFromMD: z.union([z.number(), z.string()]),
-  weeklyStSRewards: z.union([z.number(), z.string()]),
-  weeklyStSRewardsFromSeasons: z.union([z.number(), z.string()]),
-  weeklyFragmentsRewards: z.union([z.number(), z.string()]),
+  weeklyBeetsAmountFromGauge: z.union([z.number(), z.string()]).optional(),
+  weeklyBeetsAmountFromMD: z.union([z.number(), z.string()]).optional(),
+  weeklyStSRewards: z.union([z.number(), z.string()]).optional(),
+  weeklyStSRewardsFromSeasons: z.union([z.number(), z.string()]).optional(),
+  weeklyFragmentsRewards: z.union([z.number(), z.string()]).optional(),
+  protocolBounties: z.array(ProtocolBounty).optional(),
 });
 
 export type Gauge = z.infer<typeof Gauge>;
