@@ -44,3 +44,9 @@ yarn-error.log*
 # editor
 .vscode
 *.swp
+
+# local files
+/local
+
+# Local project documentation
+project.md

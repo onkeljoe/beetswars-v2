@@ -140,6 +140,29 @@ export async function getTokenPriceLive(address: string): Promise<number> {
   }
 }
 
+export async function getTokenSymbol(address: string): Promise<string | null> {
+  type TokenData = { address: string; symbol: string };
+  const queryUrl = "https://backend-v3.beets-ftm-node.com/graphql";
+  const query = gql`
+    query TokenSymbol {
+      tokenGetTokens(chains: [SONIC]) {
+        address
+        symbol
+      }
+    }
+  `;
+  try {
+    const { tokenGetTokens } = (await request(queryUrl, query)) as {
+      tokenGetTokens: TokenData[];
+    };
+    const token = tokenGetTokens.find(t => t.address.toLowerCase() === address.toLowerCase());
+    return token?.symbol ?? null;
+  } catch (error) {
+    console.error("Beetswars backend getTokenSymbol: ", error);
+    return null;
+  }
+}
+
 export async function getFancyPoolName(id: string): Promise<string> {
   const queryUrl = "https://backend-v3.beets-ftm-node.com/graphql";
   const query = gql`

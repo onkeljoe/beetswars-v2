@@ -50,25 +50,26 @@ export async function getData(round: number) {
       tokenId: 0
     },
     end
-  );
-  const priceFbeets =
-      await getPrice(
-          true,
-          {
-            token: "FBEETS",
-            tokenId: 0,
-            tokenaddress: "0x10ac2f9dae6539e77e372adb14b1bf8fbd16b3e8000200000000000000000005", // on sonic
-            isbpt: true,
-          },
-          end
-        );
+  ).catch(err => { console.error("cron: failed to fetch BEETS price", err); return 0; });
+  const priceFbeets = await getPrice(
+    true,
+    {
+      token: "FBEETS",
+      tokenId: 0,
+      tokenaddress: "0x10ac2f9dae6539e77e372adb14b1bf8fbd16b3e8000200000000000000000005", // on sonic
+      isbpt: true,
+    },
+    end
+  ).catch(err => { console.error("cron: failed to fetch FBEETS price", err); return 0; });
 
   let pricePerVp = priceFbeets;
-    const block = parseInt(prop.snapshot,10);
-    const addresses = votes.map(x => x.voter.toLowerCase());
-    const fbeetsLocked = await getRelicsFbeetsLocked(block, addresses);
-    const result = (priceFbeets * fbeetsLocked) / totalVotes;
-    pricePerVp = result;
+  const block = parseInt(prop.snapshot, 10);
+  const addresses = votes.map(x => x.voter.toLowerCase());
+  const fbeetsLocked = await getRelicsFbeetsLocked(block, addresses).catch(err => {
+    console.error("cron: failed to fetch fBEETS locked", err);
+    return 0;
+  });
+  if (fbeetsLocked && totalVotes) pricePerVp = (priceFbeets * fbeetsLocked) / totalVotes;
 
   // store to lastprice
   if (priceBeets > 0) {
@@ -104,7 +105,10 @@ export async function getData(round: number) {
         } else {
           const rewardtoken = bribefile.tokendata.find(x => x.token === reward.token);
           if (rewardtoken) {
-            const price = await getPrice(true, rewardtoken, end);
+            const price = await getPrice(true, rewardtoken, end).catch(err => {
+              console.error(`cron: failed to fetch price for ${reward.token}`, err);
+              return rewardtoken.lastprice ?? 0;
+            });
             if (price > 0 && !rewardtoken.lastprice) {
               // store to lastprice
               rewardtoken.lastprice = price;

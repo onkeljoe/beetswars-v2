@@ -30,7 +30,7 @@ export async function updateTokenPriceCache(address: string, cacheprice: number,
   const client = await clientPromise;
   const cacheCollection = client.db(dbName).collection<Tokendata>("tokens");
   await cacheCollection.updateOne(
-    { address },
+    { tokenaddress: address },
     { $set: { cacheprice, cachetimestamp } },
     { upsert: true }
   );
