@@ -1,10 +1,12 @@
-import type { Bribefile, Reward, Tokendata } from "types/bribedata.raw";
+import type { Bribedata, Bribefile, Reward, Tokendata } from "types/bribedata.raw";
 import { insertBribefile, readOneBribefile } from "utils/database/bribefile.db";
 import { findConfigEntry } from "utils/database/config.db";
 import { getSnapshotProposal } from "utils/externalData/snapshot";
 import { getAutomationData } from "utils/externalData/github";
-import { getTokenSymbol } from "utils/externalData/beetsBack";
+import { getFancyPoolName, getTokenSymbol } from "utils/externalData/beetsBack";
 import { setTokenEntry } from "utils/database/tokens.db";
+import { readRoundPoolentries } from "utils/database/votablePools.db";
+import { getPoolUrl } from "utils/api/round.helper";
 import { incPatch } from "./semVer.helper";
 
 export default async function processGithubImport(): Promise<Bribefile | string> {
@@ -22,20 +24,45 @@ export default async function processGithubImport(): Promise<Bribefile | string>
   if (!automation) return "Error: Automation data not found in GitHub";
 
   const gaugesWithBounties = automation.gauges.filter(
-    g => g.protocolBounties && g.protocolBounties.length > 0
+    g => g.protocolBounties && g.protocolBounties.some(b => b.amount > 0)
   );
   if (gaugesWithBounties.length === 0) return "No protocol bounties found for this round";
 
+  const votablePools = await readRoundPoolentries(round);
   let changed = false;
 
   for (const gauge of gaugesWithBounties) {
-    const offer = bribefile.bribedata.find(o => o.poolurl.includes(gauge.poolId));
+    let offer = bribefile.bribedata.find(o => o.poolurl.includes(gauge.poolId));
     if (!offer) {
-      console.warn(`githubImport: No offer found for poolId ${gauge.poolId} (${gauge.poolName})`);
-      continue;
+      const poolEntry = votablePools?.find(p => p.poolName === gauge.poolName);
+      if (!poolEntry) {
+        console.warn(
+          `githubImport: No votable pool entry found for ${gauge.poolName} (${gauge.poolId})`
+        );
+        continue;
+      }
+      const nextOfferId =
+        bribefile.bribedata.reduce((max, o) => (o.offerId > max ? o.offerId : max), 0) + 1;
+      const fancyName = (await getFancyPoolName(gauge.poolId)) || gauge.poolName;
+      const newOffer: Bribedata = {
+        voteindex: poolEntry.voteindex,
+        poolname: fancyName,
+        poolurl: getPoolUrl(gauge.poolId),
+        rewarddescription: "",
+        reward: [],
+        offerId: nextOfferId,
+        payoutthreshold: -1,
+      };
+      bribefile.bribedata.push(newOffer);
+      offer = newOffer;
     }
 
+    // build description from non-zero bounties
+    let descriptionParts: string[] = [];
+
     for (const bounty of gauge.protocolBounties ?? []) {
+      if (bounty.amount === 0) continue;
+
       // resolve token symbol
       let symbol = bribefile.tokendata.find(
         t => t.tokenaddress?.toLowerCase() === bounty.tokenAddress.toLowerCase()
@@ -58,6 +85,8 @@ export default async function processGithubImport(): Promise<Bribefile | string>
         await setTokenEntry(newToken);
         bribefile.tokendata.push(newToken);
       }
+
+      descriptionParts.push(`${bounty.amount.toFixed()} $${symbol}`);
 
       // find or update the protocol reward entry for this token
       const resolvedSymbol = symbol;
@@ -82,6 +111,16 @@ export default async function processGithubImport(): Promise<Bribefile | string>
           isProtocolBribe: true,
         };
         offer.reward.push(newReward);
+        changed = true;
+      }
+    }
+
+    // update rewarddescription if we have non-zero bounties
+    if (descriptionParts.length > 0) {
+      const newDescription =
+        "Vote for " + gauge.poolName + " to get a share of " + descriptionParts.join(" and ");
+      if (offer.rewarddescription !== newDescription) {
+        offer.rewarddescription = newDescription;
         changed = true;
       }
     }
