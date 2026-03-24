@@ -1,11 +1,12 @@
 import { request, gql } from "graphql-request";
-import type { RelicCount, RelicList } from "types/theGraph.raw"; // RelicPoolLevels
+import type { /* RelicCount, */ RelicList } from "types/theGraph.raw"; // RelicPoolLevels
 // import { getBlockByTsRPC } from "./liveRpcQueries";
 
-const RELIC_CONTRACT = "0x1ed6411670c709f4e163854654bd52c74e66d7ec";
+// const RELIC_CONTRACT = "0x1ed6411670c709f4e163854654bd52c74e66d7ec";
 
 const apikey = process.env.THEGRAPH_APIKEY as string;
 
+/* --- getBeetsPerBlock: currently unused, kept for future review ---
 export async function getBeetsPerBlock(block: number): Promise<number> {
   // const queryUrl = "https://api.studio.thegraph.com/query/73674/masterchefv2/version/latest/";
   const queryUrl = "https://gateway.thegraph.com/api/" + apikey + "/deployments/id/QmUM8aU6H3gFx6JL65GQV5baPPjczU9hUb6VRiDQ1jEp3B";
@@ -31,6 +32,7 @@ export async function getBeetsPerBlock(block: number): Promise<number> {
     return 0;
   }
 }
+--- */
 
 // export async function getBlockByTsGraph(ts: number): Promise<number> {
 //   const queryUrl = "https://gateway-arbitrum.network.thegraph.com/api/" + apikey + "/subgraphs/id/3drjZDpA9hAuYGA19ttEkhW432mVe2XHy5YarBDVYHbz";
@@ -66,8 +68,9 @@ export async function getRelicsFbeetsLocked(
   block: number,
   voterAdresses?: string[]
 ): Promise<number> {
-  // const queryUrl = "https://api.studio.thegraph.com/query/73674/mabeets-sonic/version/latest/";
-  const queryUrl = "https://gateway.thegraph.com/api/" + apikey + "/deployments/id/QmUM8aU6H3gFx6JL65GQV5baPPjczU9hUb6VRiDQ1jEp3B";
+  // Sonic maBEETS subgraph (replaces old Fantom deployment QmUM8aU6H3g...)
+  // Docs: https://docs.beets.fi/technicals/subgraphs
+  const queryUrl = "https://gateway.thegraph.com/api/" + apikey + "/subgraphs/id/843dz5s6wGZDY19CRpMMgzqtHiQZdwzZcCN7bkCHwpLn";
   try {
     let allResults: RelicList[] = [];
     const first = 1000;
@@ -168,6 +171,7 @@ export async function getRelicsFbeetsLocked(
 //   }
 // }
 
+/* --- getRelicCount: currently unused, kept for future review ---
 export async function getRelicCount(block: number): Promise<number> {
   // const queryUrl = "https://api.studio.thegraph.com/query/73674/mabeets-sonic/version/latest/";
   const queryUrl = "https://gateway.thegraph.com/api/" + apikey + "/deployments/id/QmUM8aU6H3gFx6JL65GQV5baPPjczU9hUb6VRiDQ1jEp3B";
@@ -196,6 +200,7 @@ export async function getRelicCount(block: number): Promise<number> {
     return 0;
   }
 }
+--- */
 
 // export async function getRelicLevelInfo(block: number) {
 //   const queryUrl = "https://api.studio.thegraph.com/query/73674/mabeets-sonic/version/latest/";

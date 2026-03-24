@@ -2,34 +2,41 @@ import { request, gql } from "graphql-request";
 
 // get historic price for single token
 export async function getTokenPrice(timestamp: number, address: string): Promise<number> {
-  type Chartdata = { id: string; price: string; timestamp: number };
+  type PriceEntry = { price: number; timestamp: string };
+  type HistoricalPrice = { address: string; prices: PriceEntry[] };
   const queryUrl = "https://backend-v3.beets-ftm-node.com/graphql";
-  // chain: FANTOM
   const query = gql`
     query Chartdata {
-      tokenGetPriceChartData(
-        address: "${address.toLowerCase()}"
+      tokenGetHistoricalPrices(
+        addresses: ["${address.toLowerCase()}"]
         range: THIRTY_DAY
         chain: SONIC
       ) {
-        id
-        price
-        timestamp
+        address
+        prices {
+          price
+          timestamp
+        }
       }
     }
   `;
   try {
-    const { tokenGetPriceChartData } = (await request(queryUrl, query)) as {
-      tokenGetPriceChartData: Chartdata[];
+    const { tokenGetHistoricalPrices } = (await request(queryUrl, query)) as {
+      tokenGetHistoricalPrices: HistoricalPrice[];
     };
-    const result = tokenGetPriceChartData.reduce(
+    const tokenData = tokenGetHistoricalPrices.find(
+      t => t.address.toLowerCase() === address.toLowerCase()
+    );
+    if (!tokenData?.prices.length) return 0;
+    const result = tokenData.prices.reduce(
       (max, current) => {
-        if (current.timestamp <= timestamp && current.timestamp > max.timestamp) {
+        const currentTs = Number(current.timestamp);
+        if (currentTs <= timestamp && currentTs > Number(max.timestamp)) {
           return current;
         }
         return max;
       },
-      { id: "", price: "", timestamp: 0 }
+      { price: 0, timestamp: "0" }
     );
     return +result.price;
   } catch (error) {
