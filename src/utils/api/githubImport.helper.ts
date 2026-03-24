@@ -58,7 +58,7 @@ export default async function processGithubImport(): Promise<Bribefile | string>
     }
 
     // build description from non-zero bounties
-    let descriptionParts: string[] = [];
+    const descriptionParts: string[] = [];
 
     for (const bounty of gauge.protocolBounties ?? []) {
       if (bounty.amount === 0) continue;
