@@ -70,7 +70,8 @@ export async function getRelicsFbeetsLocked(
 ): Promise<number> {
   // Sonic maBEETS subgraph (replaces old Fantom deployment QmUM8aU6H3g...)
   // Docs: https://docs.beets.fi/technicals/subgraphs
-  const queryUrl = "https://gateway.thegraph.com/api/" + apikey + "/subgraphs/id/843dz5s6wGZDY19CRpMMgzqtHiQZdwzZcCN7bkCHwpLn";
+  const queryUrl =
+    "https://api.subgraph.ormilabs.com/api/public/717cf785-de57-4761-94dd-9ac51b019902/subgraphs/mabeets-sonic/latest/gn";
   try {
     let allResults: RelicList[] = [];
     const first = 1000;
