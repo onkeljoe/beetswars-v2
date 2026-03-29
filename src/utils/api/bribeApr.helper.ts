@@ -58,8 +58,12 @@ export async function getEmissionForRound(round: number): Promise<EmissionData |
   const chartdata = await readOneChartdata(round);
 
   const beetsPrice = !chartdata
-    ? // ? await getCoingeckoCurrentPrice("beethoven-x")
-      await getPrice(false, { token: "BEETS", tokenId: 0, coingeckoid: "beethoven-x" })
+    ? await getPrice(false, {
+        token: "BEETS",
+        tokenId: 0,
+        tokenaddress: "0x2d0e0814e62d80056181f5cd932274405966e4f0",
+        coingeckoid: "beethoven-x",
+      })
     : chartdata.priceBeets;
   const usdValue = emission * beetsPrice;
   // const voteEmissionPercent = round < 29 ? 0.3 : 0.5;
