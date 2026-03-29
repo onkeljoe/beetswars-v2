@@ -62,12 +62,10 @@ export async function getEmissionForRound(round: number): Promise<EmissionData |
         token: "BEETS",
         tokenId: 0,
         tokenaddress: "0x2d0e0814e62d80056181f5cd932274405966e4f0",
-        coingeckoid: "beethoven-x",
+        coingeckoid: "beets",
       })
     : chartdata.priceBeets;
   const usdValue = emission * beetsPrice;
-  // const voteEmissionPercent = round < 29 ? 0.3 : 0.5;
-  // const voteEmission = Math.round(emission * 0.872 * voteEmissionPercent); // 30% or 50% of 87.2% of emissions
   const voteEmission = emission;
   const percentUsdValue = (voteEmission * beetsPrice) / 100;
 

@@ -46,7 +46,7 @@ export async function getData(round: number) {
   const priceBeets = await getPrice(
     true,
     {
-      token: "BEETS", tokenaddress: '0x2d0e0814e62d80056181f5cd932274405966e4f0', coingeckoid: "beethoven-x",
+      token: "BEETS", tokenaddress: '0x2d0e0814e62d80056181f5cd932274405966e4f0', coingeckoid: "beets",
       tokenId: 0
     },
     end
